@@ -7,19 +7,22 @@ import bondar.iot.ecotrackerback.request.SubscriptionRequest;
 import nl.martijndwars.webpush.Notification;
 import nl.martijndwars.webpush.PushService;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.jose4j.lang.JoseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.security.Security;
-import java.util.concurrent.ExecutionException;
 
 @Service
 public class PushNotificationService {
-
+    Logger logger = LoggerFactory.getLogger(PushNotificationService.class);
+    private static final String pushJSON = "{\n" +
+            "  \"title\": \"Нове повідомлення\",\n" +
+            "  \"body\": \"У вас є нове повідомлення!\",\n" +
+            "  \"icon\": \"/icon.png\"\n" +
+            "}";
     private final SubscriptionRepository subscriptionRepository;
     private final String publicVapidKey;
     private final String privateVapidKey;
@@ -45,6 +48,8 @@ public class PushNotificationService {
             subscription.setAuth(request.getAuth());
 
             subscriptionRepository.save(subscription); // Зберігаємо підписку в БД
+
+            logger.info("Subscribed deviceId: " + request.getDeviceId());
         }
     }
 
@@ -60,15 +65,12 @@ public class PushNotificationService {
                         subscription.getEndpoint(),
                         subscription.getP256dh(),
                         subscription.getAuth(),
-                        "{\n" +
-                                "  \"title\": \"Нове повідомлення\",\n" +
-                                "  \"body\": \"У вас є нове повідомлення!\",\n" +
-                                "  \"icon\": \"/icon.png\"\n" +
-                                "}".getBytes()
+                        pushJSON.getBytes()
                 );
 
                 pushService.send(notification);
             } catch (Exception e) {
+                logger.info("Exception during sending push \n" + e);
                 throw new RuntimeException(e);
             }
         } else {
