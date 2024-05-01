@@ -22,8 +22,8 @@ public class DeviceViewController {
 
     @GetMapping("/")
     public String listDevices(Model model) {
-        List<String> devices = audioDataService.getAllDevices();
-        model.addAttribute("devices", devices);
+        List<AudioData> audioDataList = audioDataService.getAllDevices();
+        model.addAttribute("audioDataList", audioDataList);
         return "index";
     }
 

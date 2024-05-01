@@ -26,7 +26,7 @@ public class AudioDataService {
         return audioDataRepository.findAllByDeviceId(deviceId);
     }
 
-    public List<String> getAllDevices() {
+    public List<AudioData> getAllDevices() {
         return audioDataRepository.findDistinctDevices();
     }
 }
