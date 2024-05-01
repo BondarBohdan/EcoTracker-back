@@ -14,7 +14,7 @@ public class AudioData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Double audioLevel;
+    private Double averageAudioAmplitude;
     private LocalDateTime timestamp;
     private String deviceId;
 }

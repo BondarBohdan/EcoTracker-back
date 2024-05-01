@@ -21,4 +21,12 @@ public class AudioDataService {
     public List<AudioData> getAllAudioData() {
         return audioDataRepository.findAll();
     }
+
+    public List<AudioData> findAudioDataByDeviceId(String deviceId) {
+        return audioDataRepository.findAllByDeviceId(deviceId);
+    }
+
+    public List<String> getAllDevices() {
+        return audioDataRepository.findDistinctDevices();
+    }
 }

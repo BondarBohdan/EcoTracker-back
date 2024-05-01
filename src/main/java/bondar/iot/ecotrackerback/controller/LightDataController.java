@@ -21,15 +21,10 @@ public class LightDataController {
     @PostMapping
     public ResponseEntity<?> saveLightData(@RequestBody LightRequest lightRequest) {
         try {
-//            lightService.processLightData(request);
+            lightDataService.saveLightData(lightRequest.getData());
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing light data");
         }
-    }
-
-    @GetMapping
-    public ResponseEntity<List<LightData>> getAllLightData() {
-        return ResponseEntity.ok(lightDataService.getAllLightData());
     }
 }

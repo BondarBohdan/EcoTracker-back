@@ -1,5 +1,6 @@
 package bondar.iot.ecotrackerback.service;
 
+import bondar.iot.ecotrackerback.model.AudioData;
 import bondar.iot.ecotrackerback.model.LightData;
 import bondar.iot.ecotrackerback.repository.LightDataRepository;
 import org.springframework.stereotype.Service;
@@ -20,5 +21,10 @@ public class LightDataService {
 
     public List<LightData> getAllLightData() {
         return lightDataRepository.findAll();
+    }
+
+
+    public List<LightData> findLightDataByDeviceId(String deviceId) {
+        return lightDataRepository.findAllByDeviceId(deviceId);
     }
 }

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Device Details</title>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+
+</head>
+<body>
+<h1>Device Details for: <span id="deviceId" th:text="${deviceId}">device-qor7nhez6</span></h1>
+<canvas id="audioChart"></canvas>
+<div>
+    <button onclick="sendAudioAlert()">SEND ALERT: High Audio Level</button>
+</div>
+
+<canvas id="lightChart"></canvas>
+<div>
+    <button onclick="sendLightAlert()">SEND ALERT: High Light Level</button>
+</div>
+
+<script>
+    const deviceId = document.getElementById('deviceId').textContent;
+    let audioChart = null;
+    let lightChart = null;
+
+    function initCharts(audioData, lightData) {
+        const audioCtx = document.getElementById('audioChart').getContext('2d');
+        const lightCtx = document.getElementById('lightChart').getContext('2d');
+
+        if (audioChart) {
+            audioChart.destroy();
+        }
+        if (lightChart) {
+            lightChart.destroy();
+        }
+
+        // Create new chart instances
+        audioChart = new Chart(audioCtx, {
+            type: 'line',
+            data: {
+                datasets: [{
+                    label: 'Audio Level',
+                    data: audioData,
+                    borderColor: 'rgb(75, 192, 192)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            // parser: 'YYYY-MM-DDTHH:mm:ss.sssZ',
+                            tooltipFormat: 'YYYY-MM-DDTHH:mm:ss.sssZ'
+                        },
+                        ticks: {
+                            autoSkip: true,
+                            maxTicksLimit: 20 // Adjust based on your preference for label density
+                        }
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    zoom: {
+                        zoom: {
+                            wheel: {
+                                enabled: true, // Enable zooming with the mouse wheel
+                            },
+                            pinch: {
+                                enabled: true // Enable zooming with pinch gestures on touchscreens
+                            },
+                            mode: 'xy' // Enable zooming in the x and y directions
+                        },
+                        pan: {
+                            enabled: true, // Enable panning
+                            mode: 'xy', // Allow panning in x and y axes
+                            threshold: 10, // Minimum drag before panning starts
+                        }
+                    }
+                }
+            }
+        });
+
+        lightChart = new Chart(lightCtx, {
+            type: 'line',
+            data: {
+                datasets: [{
+                    label: 'Light Level',
+                    data: lightData,
+                    borderColor: 'rgb(255, 99, 132)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            // parser: 'll HH:mm',
+                            tooltipFormat: 'YYYY-MM-DDTHH:mm:ss.sssZ'
+                        },
+                        ticks: {
+                            autoSkip: true,
+                            maxTicksLimit: 20
+                        }
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    zoom: {
+                        zoom: {
+                            wheel: {
+                                enabled: true, // Enable zooming with the mouse wheel
+                            },
+                            pinch: {
+                                enabled: true // Enable zooming with pinch gestures on touchscreens
+                            },
+                            mode: 'xy' // Enable zooming in the x and y directions
+                        },
+                        pan: {
+                            enabled: true, // Enable panning
+                            mode: 'xy', // Allow panning in x and y axes
+                            threshold: 10, // Minimum drag before panning starts
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function fetchDataAndUpdateChart() {
+        fetch(`/api/device-data/${deviceId}`)
+            .then(response => response.json())
+            .then(data => {
+                initCharts(
+                    data.audioData.map(d => ({ x: new Date(d.timestamp), y: d.averageAudioAmplitude })),
+                    data.lightData.map(d => ({ x: new Date(d.timestamp), y: d.lightLevel }))
+                );
+            })
+            .catch(error => {
+                console.error('Failed to fetch new data:', error);
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchDataAndUpdateChart();
+        setInterval(fetchDataAndUpdateChart, 15000);
+    });
+
+    function sendAudioAlert() {
+        const deviceId = document.getElementById('deviceId').textContent;
+        fetch(`/api/send-audio-alert/${deviceId}`, {
+            method: 'POST'
+        }).then(response => {
+            console.log('Alert for high audio level sent!');
+        }).catch(error => {
+            console.error('Error sending audio alert:', error);
+        });
+    }
+
+    function sendLightAlert() {
+        const deviceId = document.getElementById('deviceId').textContent;
+        fetch(`/api/send-light-alert/${deviceId}`, {
+            method: 'POST'
+        }).then(response => {
+            console.log('Alert for high light level sent!');
+        }).catch(error => {
+            console.error('Error sending light alert:', error);
+        });
+    }
+</script>
+</body>
+</html>
