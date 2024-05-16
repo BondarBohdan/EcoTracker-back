@@ -1,0 +1,16 @@
+bondar\iot\ecotrackerback\EcotrackerBackApplication.class
+bondar\iot\ecotrackerback\request\AudioRequest.class
+bondar\iot\ecotrackerback\model\AudioData.class
+bondar\iot\ecotrackerback\configuration\WebConfig.class
+bondar\iot\ecotrackerback\controller\LightDataController.class
+bondar\iot\ecotrackerback\service\AudioDataService.class
+bondar\iot\ecotrackerback\controller\DeviceViewController.class
+bondar\iot\ecotrackerback\model\LightData.class
+bondar\iot\ecotrackerback\request\LightRequest.class
+bondar\iot\ecotrackerback\repository\LightDataRepository.class
+bondar\iot\ecotrackerback\controller\AudioDataController.class
+bondar\iot\ecotrackerback\repository\AudioDataRepository.class
+bondar\iot\ecotrackerback\service\NotificationService.class
+bondar\iot\ecotrackerback\controller\NotificationController.class
+bondar\iot\ecotrackerback\controller\DataApiController.class
+bondar\iot\ecotrackerback\service\LightDataService.class

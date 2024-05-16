@@ -2,7 +2,18 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Device Details</title>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 600px;
+            height: 400px;
+        }
+        #audioChart, #lightChart {
+            width: 100% !important;
+            height: 100% !important;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment"></script>
@@ -11,14 +22,23 @@
 </head>
 <body>
 <h1>Device Details for: <span id="deviceId" th:text="${deviceId}">device-qor7nhez6</span></h1>
-<canvas id="audioChart"></canvas>
+<div class="chart-container">
+    <canvas id="audioChart"></canvas>
+</div>
 <div>
     <button onclick="sendAudioAlert()">SEND ALERT: High Audio Level</button>
 </div>
 
-<canvas id="lightChart"></canvas>
+<div class="chart-container">
+    <canvas id="lightChart"></canvas>
+</div>
 <div>
     <button onclick="sendLightAlert()">SEND ALERT: High Light Level</button>
+</div>
+
+<div id="weather">
+    <h2>Weather Information</h2>
+    <div id="weatherData"></div>
 </div>
 
 <script>
@@ -37,7 +57,6 @@
             lightChart.destroy();
         }
 
-        // Create new chart instances
         audioChart = new Chart(audioCtx, {
             type: 'line',
             data: {
@@ -53,12 +72,11 @@
                     x: {
                         type: 'time',
                         time: {
-                            // parser: 'YYYY-MM-DDTHH:mm:ss.sssZ',
                             tooltipFormat: 'YYYY-MM-DDTHH:mm:ss.sssZ'
                         },
                         ticks: {
                             autoSkip: true,
-                            maxTicksLimit: 20 // Adjust based on your preference for label density
+                            maxTicksLimit: 20
                         }
                     },
                     y: {
@@ -66,20 +84,24 @@
                     }
                 },
                 plugins: {
+                    title: {
+                        display: true,
+                        text: 'Audio Level Over Time'
+                    },
                     zoom: {
                         zoom: {
                             wheel: {
-                                enabled: true, // Enable zooming with the mouse wheel
+                                enabled: true,
                             },
                             pinch: {
-                                enabled: true // Enable zooming with pinch gestures on touchscreens
+                                enabled: true
                             },
-                            mode: 'xy' // Enable zooming in the x and y directions
+                            mode: 'xy'
                         },
                         pan: {
-                            enabled: true, // Enable panning
-                            mode: 'xy', // Allow panning in x and y axes
-                            threshold: 10, // Minimum drag before panning starts
+                            enabled: true,
+                            mode: 'xy',
+                            threshold: 10,
                         }
                     }
                 }
@@ -101,7 +123,6 @@
                     x: {
                         type: 'time',
                         time: {
-                            // parser: 'll HH:mm',
                             tooltipFormat: 'YYYY-MM-DDTHH:mm:ss.sssZ'
                         },
                         ticks: {
@@ -114,20 +135,24 @@
                     }
                 },
                 plugins: {
+                    title: {
+                        display: true,
+                        text: 'Light Level Over Time'
+                    },
                     zoom: {
                         zoom: {
                             wheel: {
-                                enabled: true, // Enable zooming with the mouse wheel
+                                enabled: true,
                             },
                             pinch: {
-                                enabled: true // Enable zooming with pinch gestures on touchscreens
+                                enabled: true
                             },
-                            mode: 'xy' // Enable zooming in the x and y directions
+                            mode: 'xy'
                         },
                         pan: {
-                            enabled: true, // Enable panning
-                            mode: 'xy', // Allow panning in x and y axes
-                            threshold: 10, // Minimum drag before panning starts
+                            enabled: true,
+                            mode: 'xy',
+                            threshold: 10,
                         }
                     }
                 }
@@ -151,6 +176,7 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         fetchDataAndUpdateChart();
+        fetchWeatherData();
         setInterval(fetchDataAndUpdateChart, 15000);
     });
 
@@ -174,6 +200,17 @@
         }).catch(error => {
             console.error('Error sending light alert:', error);
         });
+    }
+
+    function fetchWeatherData() {
+        fetch(`https://wttr.in/Lviv?format=%t+%C+%w`)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('weatherData').innerText = data;
+            })
+            .catch(error => {
+                console.error('Failed to fetch weather data:', error);
+            });
     }
 </script>
 </body>
